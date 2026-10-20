@@ -166,6 +166,64 @@ nav button.on{color:var(--accent)} nav button.on .e{filter:none;opacity:1}
 .inst .t small{display:block;color:var(--muted);font-weight:700;font-size:12px;margin-top:2px}
 .inst .btn{flex:none;background:var(--accent);color:#fff;border:0;padding:11px 16px}
 .hide{display:none!important}
+
+/* agenda harian */
+.pill.on{border-color:var(--accent);background:var(--accent-soft)}
+.ag-chk{cursor:pointer;border:1.5px solid var(--line);font-size:20px;padding:0;color:var(--muted)}
+.ag-chk.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.ag-done .meta b{text-decoration:line-through;color:var(--muted)}
+.ag-add{display:grid;gap:10px;margin-top:6px}
+.ag-add .field{padding:11px 13px}
+.ag-day{display:flex;align-items:center;justify-content:space-between;margin:14px 0 12px;gap:8px}
+.ag-day div{text-align:center;flex:1;min-width:0}
+.ag-day b{display:block;font-size:18px;font-weight:800}
+.ag-day small{color:var(--muted);font-weight:700;font-size:12px}
+@media (max-width:380px){.brand small{display:none}.brand h1{font-size:19px}.pill.txt{padding:0 10px}}
+
+/* ===== Tampilan baru: tombol & navigasi ===== */
+:root{--sh:0 6px 18px -8px rgba(60,30,120,.35);--sh2:0 10px 24px -10px rgba(123,63,228,.7)}
+:root[data-theme="dark"]{--sh:0 6px 18px -8px rgba(0,0,0,.8);--sh2:0 10px 24px -10px rgba(162,123,245,.55)}
+button{transition:transform .12s ease,box-shadow .2s ease,background .2s ease}
+button:active{transform:scale(.95)}
+.card{border-radius:28px;box-shadow:var(--sh);border-color:transparent}
+.btn{border-radius:999px;border:0;background:var(--soft);box-shadow:inset 0 0 0 1.5px var(--line);font-weight:800;padding:11px 18px}
+.btn:hover{box-shadow:inset 0 0 0 1.5px var(--accent)}
+.btn.sm{padding:8px 14px;border-radius:999px;font-size:13px}
+.btn.primary{border-radius:999px;box-shadow:var(--sh2);padding:16px;letter-spacing:.2px}
+.btn.ok{border-radius:999px;background:linear-gradient(90deg,var(--accent2),var(--accent));border:0;box-shadow:var(--sh2)}
+.danger{border-radius:999px;box-shadow:0 8px 20px -10px var(--bad)}
+.pill{border-radius:50%;width:44px;padding:0;border:0;background:var(--accent-soft);box-shadow:var(--sh)}
+.pill.txt{border-radius:999px;width:auto;padding:0 16px;background:linear-gradient(90deg,var(--accent2),var(--accent));color:#fff;box-shadow:var(--sh2)}
+.pill.on{background:var(--accent);box-shadow:var(--sh2)}
+.round{border:0;background:var(--accent-soft);color:var(--accent);font-weight:800;box-shadow:var(--sh)}
+.chip{border:0;box-shadow:inset 0 0 0 1.5px var(--line);background:var(--soft);font-weight:800;padding:9px 16px}
+.chip.on{background:linear-gradient(90deg,var(--accent2),var(--accent));box-shadow:var(--sh2);color:#fff}
+.chip.act.on{background:var(--c);box-shadow:0 8px 18px -8px var(--c)}
+.rc{box-shadow:var(--sh)}
+.ico{border-radius:16px}
+nav{left:50%;right:auto;transform:translateX(-50%);width:calc(100% - 24px);max-width:536px;bottom:calc(10px + env(safe-area-inset-bottom));
+  border:0;border-radius:30px;box-shadow:0 12px 34px -10px rgba(40,20,90,.45);padding:6px 6px;background:var(--card);padding-bottom:6px}
+nav .in{max-width:none;gap:4px}
+nav button{border-radius:24px;padding:8px 0 7px;font-weight:800}
+nav button.on{background:var(--accent-soft)}
+nav button .e{font-size:23px}
+body{padding-bottom:calc(112px + env(safe-area-inset-bottom))}
+#toast{bottom:calc(112px + env(safe-area-inset-bottom))}
+.sheet{border-radius:32px 32px 0 0}
+/* agenda: kalender & jenis kegiatan */
+.ag-cal .day{min-height:46px;border-radius:16px}
+.ag-calh{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.ag-calh b{font-size:17px;font-weight:800;flex:1;text-align:center}
+.ag-calh .round{width:38px;height:38px;font-size:17px}
+.ag-scroll{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 10px;margin:0 -2px;scrollbar-width:none}
+.ag-scroll::-webkit-scrollbar{display:none}
+.ag-scroll .chip{white-space:nowrap;flex:none;padding:8px 14px;font-size:13px}
+.ag-lbl{display:block;font-size:12px;font-weight:800;color:var(--muted);margin:2px 0 -4px}
+.ag-sum{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px}
+.ag-sum .stat{padding:10px 8px;text-align:center}
+.ag-sum .stat b{font-size:17px}
+.ag-tag{display:inline-block;font-size:11px;font-weight:800;padding:2px 9px;border-radius:99px;margin-left:6px;vertical-align:middle}
+.ag-meta{display:block;color:var(--muted);font-weight:700;font-size:12px;margin-top:3px;line-height:1.5}
 </style>
 </head>
 <body>
@@ -176,6 +234,7 @@ nav button.on{color:var(--accent)} nav button.on .e{filter:none;opacity:1}
       <h1><img src="icon-192.png" alt=""><span>Mr. Activity</span></h1>
       <small>Data hanya di perangkatmu</small>
     </div>
+    <button class="pill" id="agBtn" aria-label="Agenda harian">📝</button>
     <button class="pill txt" id="todayBtn">Hari ini</button>
     <button class="pill" id="themeBtn" aria-label="Ganti tema">🌙</button>
   </div>
@@ -234,7 +293,7 @@ const KEY = "mr-activity-v2";
 function norm(d){
   return {records:d.records||[], routine:d.routine||{}, weights:d.weights||[],
     goals:Object.assign({week:4, minutes:600, targetKg:"", startKg:"", height:"", sex:""}, d.goals||{}),
-    theme:d.theme||null, tab:"cal"};
+    agenda:Array.isArray(d.agenda)?d.agenda:[], theme:d.theme||null, tab:"cal"};
 }
 function load(){
   try{ const d=JSON.parse(localStorage.getItem(KEY)); if(d && Array.isArray(d.records)) return norm(d); }catch(e){}
@@ -286,10 +345,12 @@ function render(keepScroll){
   applyTheme();
   document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on", b.dataset.t===S.tab));
   const y = window.scrollY;
-  $("#view").innerHTML = ({cal:viewCal, add:viewAdd, bb:viewBB, report:viewReport})[S.tab]();
+  $("#view").innerHTML = ({cal:viewCal, add:viewAdd, bb:viewBB, report:viewReport, agenda:viewAgenda})[S.tab]();
+  { const ag=S.tab==="agenda", b=$("#agBtn"); b.classList.toggle("on", ag); b.textContent=ag?"🏋️":"📝"; b.setAttribute("aria-label", ag?"Catat olahraga":"Agenda harian"); }
   if(S.tab==="add") bindAdd();
   if(S.tab==="bb") bindBB();
   if(S.tab==="report") bindReport();
+  if(S.tab==="agenda") bindAgenda();
   window.scrollTo(0, keepScroll ? y : 0);
 }
 function monthNav(){
@@ -747,6 +808,159 @@ function drawRoutineSheet(){
 }
 
 let tt; function toast(m){ const t=$("#toast"); t.textContent=m; t.classList.add("show"); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove("show"),2300); }
+
+/* ================= Agenda harian ================= */
+const AG_CATS = {
+  kerja:{n:"Kerja",e:"💼",c:"#1c7ed6"}, belajar:{n:"Belajar",e:"📚",c:"#7b3fe4"}, pribadi:{n:"Pribadi",e:"🙂",c:"#e8590c"},
+  keluarga:{n:"Keluarga",e:"👨‍👩‍👧",c:"#d6336c"}, belanja:{n:"Belanja",e:"🛒",c:"#f08c00"}, kesehatan:{n:"Kesehatan",e:"💊",c:"#2f9e44"},
+  sosial:{n:"Sosial",e:"🎉",c:"#12a594"}, lainnya:{n:"Lainnya",e:"📌",c:"#6b6b76"}
+};
+const AG_PRIO = ["Biasa","Penting","Mendesak"];
+const AG_DURS = [15,30,45,60,90,120,180];
+const catOf = k => AG_CATS[k] || AG_CATS.lainnya;
+let agDate = todayIso();
+let agCur = {y:new Date().getFullYear(), m:new Date().getMonth()};
+let agEdit = null, agCat = "kerja", agFilter = "all";
+let agForm = {title:"",time:"",dur:"",loc:"",prio:"0",note:"",rep:"0",cnt:"4"};
+
+function shiftDay(d,n){ const x=parse(d); x.setDate(x.getDate()+n); return iso(x); }
+function fmtDur(m){ m=+m||0; if(!m) return ""; const h=Math.floor(m/60), r=m%60; return h?`${h}j${r?" "+r+"m":""}`:`${r}m`; }
+function endTime(t,m){ if(!t||!(+m)) return ""; const [h,mi]=t.split(":").map(Number); const x=(h*60+mi+ +m)%1440; return `${pad(Math.floor(x/60))}:${pad(x%60)}`; }
+function agOn(d){
+  return (S.agenda||[]).filter(a=>a.date===d)
+    .sort((a,b)=>(a.done?1:0)-(b.done?1:0)||(a.time||"99:99").localeCompare(b.time||"99:99")||(b.prio||0)-(a.prio||0));
+}
+function agSync(){
+  if(agEdit || !$("#agT")) return;
+  agForm = {title:$("#agT").value, time:$("#agH").value, dur:$("#agD").value, loc:$("#agL").value,
+    prio:$("#agP").value, note:$("#agN").value, rep:$("#agR").value, cnt:$("#agC").value};
+}
+function agCalHtml(){
+  const mk=`${agCur.y}-${pad(agCur.m+1)}`, t=todayIso(), off=(new Date(agCur.y,agCur.m,1).getDay()+6)%7, nd=new Date(agCur.y,agCur.m+1,0).getDate();
+  let c=["Sen","Sel","Rab","Kam","Jum","Sab","Min"].map(d=>`<div class="wd">${d}</div>`).join("");
+  for(let i=0;i<off;i++) c+=`<div class="day out"></div>`;
+  for(let d=1; d<=nd; d++){
+    const ds=`${mk}-${pad(d)}`, L=agOn(ds), cats=[...new Set(L.map(a=>a.cat||"lainnya"))];
+    const dots=cats.slice(0,4).map(k=>{ const on=L.some(a=>(a.cat||"lainnya")===k && !a.done); return `<i class="dot ${on?"":"plan"}" style="--c:${catOf(k).c}"></i>`; }).join("")
+      + (cats.length>4?`<span class="more">+${cats.length-4}</span>`:"");
+    c+=`<button class="day ${ds===agDate?"sel":""} ${ds===t?"today":""}" data-ag="day" data-d="${ds}" aria-label="${d} ${MONTHS[agCur.m]}"><span class="n">${d}</span><span class="dots">${dots}</span></button>`;
+  }
+  return `<div class="ag-calh"><button class="round" data-ag="mnav" data-n="-1" aria-label="Bulan lalu">‹</button>
+      <b>${MONTHS[agCur.m]} ${agCur.y}</b><button class="round" data-ag="mnav" data-n="1" aria-label="Bulan depan">›</button></div>
+    <div class="cal ag-cal">${c}</div>
+    <div class="legend">${Object.values(AG_CATS).map(k=>`<span><i style="background:${k.c}"></i>${k.n}</span>`).join("")}</div>
+    <div class="hint" style="margin-top:8px">Titik penuh = belum selesai, titik kosong = sudah selesai.</div>`;
+}
+function viewAgenda(){
+  const t=todayIso(), all=agOn(agDate), total=all.length, done=all.filter(a=>a.done).length;
+  const list = agFilter==="all" ? all : all.filter(a=>(a.cat||"lainnya")===agFilter);
+  const pct = total ? Math.round(done/total*100) : 0, d=parse(agDate);
+  const mins = all.reduce((s,a)=>s+(+a.dur||0),0);
+  const ed = agEdit ? (S.agenda||[]).find(a=>a.id===agEdit) : null;
+  const f = ed ? {title:ed.title,time:ed.time||"",dur:ed.dur||"",loc:ed.loc||"",prio:String(ed.prio||0),note:ed.note||"",rep:"0",cnt:"4"} : agForm;
+  const late = (S.agenda||[]).filter(a=>!a.done && a.date<t).length;
+  const sports = recsOn(agDate).map(r=>`${ACTS[r.act].emoji} ${esc(r.type)}${r.time?" "+esc(r.time):""}${r.status==="plan"?" (rencana)":""}`)
+    .concat(routineOn(agDate).map(x=>`${ACTS[x.act].emoji} ${esc(x.type)}${x.time?" "+esc(x.time):""} (jadwal rutin)`));
+  const items = list.map(a=>{
+    const k=catOf(a.cat), en=endTime(a.time,a.dur);
+    const meta=[a.time?`🕐 ${esc(a.time)}${en?"–"+en:""}`:"", a.dur?`⏱️ ${fmtDur(a.dur)}`:"", a.loc?`📍 ${esc(a.loc)}`:""].filter(Boolean).join(" · ") || "Tanpa jam";
+    return `<div class="item ${a.done?"ag-done":""}">
+      <button class="ico ag-chk ${a.done?"on":""}" data-ag="toggle" data-id="${a.id}" aria-label="Tandai selesai">${a.done?"✓":k.e}</button>
+      <div class="meta"><b>${esc(a.title)}${a.prio===2?`<span class="ag-tag" style="background:var(--bad);color:#fff">Mendesak</span>`:a.prio===1?`<span class="badge plan">Penting</span>`:""}</b>
+        <span class="ag-meta"><span class="ag-tag" style="margin:0 6px 0 0;background:${k.c}22;color:${k.c}">${k.n}</span>${meta}</span></div>
+      <div></div>
+      ${a.note?`<div class="detail">${esc(a.note)}</div>`:""}
+      <div class="actions"><button class="btn sm" data-ag="edit" data-id="${a.id}">✏️ Ubah</button><button class="btn sm" data-ag="del" data-id="${a.id}">🗑️ Hapus</button></div>
+    </div>`; }).join("");
+  const filt = `<div class="ag-scroll"><button class="chip ${agFilter==="all"?"on":""}" data-ag="filter" data-k="all">Semua</button>${
+    Object.entries(AG_CATS).map(([k,v])=>`<button class="chip ${agFilter===k?"on":""}" data-ag="filter" data-k="${k}">${v.e} ${v.n}</button>`).join("")}</div>`;
+  return `<div class="card" style="margin-top:14px">${agCalHtml()}</div>
+    <div class="card">
+      <div class="rowb"><span><b>${DAYSF[d.getDay()]}, ${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}</b>${agDate===t?" · Hari ini":""}</span>
+        <button class="btn sm" data-ag="today">Ke hari ini</button></div>
+      <div class="prog"><i style="width:${pct}%"></i></div>
+      <div class="ag-sum"><div class="stat"><small>Agenda</small><b>${total}</b></div><div class="stat"><small>Selesai</small><b class="good">${done}</b></div><div class="stat"><small>Total waktu</small><b>${fmtDur(mins)||"-"}</b></div></div>
+      ${sports.length?`<div class="note info">🏃 Olahraga hari ini: ${sports.join(", ")}</div>`:""}
+      ${late?`<div class="note warn">⚠️ ${late} agenda hari sebelumnya belum selesai</div>`:""}
+    </div>
+    <div class="card">
+      <h2>${ed?"Ubah agenda":"Tambah agenda"}</h2>
+      <div class="ag-add">
+        <input class="field" id="agT" type="text" maxlength="120" autocomplete="off" placeholder="Nama kegiatan, mis. Meeting tim" value="${esc(f.title)}">
+        <span class="ag-lbl">Jenis kegiatan</span>
+        <div class="ag-scroll" id="agCats">${Object.entries(AG_CATS).map(([k,v])=>`<button class="chip act ${k===agCat?"on":""}" style="--c:${v.c}" data-ag="cat" data-k="${k}">${v.e} ${v.n}</button>`).join("")}</div>
+        <div class="row2"><div><span class="ag-lbl">Jam mulai</span><input class="field" id="agH" type="time" value="${esc(f.time)}"></div>
+          <div><span class="ag-lbl">Durasi (menit)</span><input class="field" id="agD" type="number" inputmode="numeric" min="0" max="1440" placeholder="mis. 60" value="${esc(f.dur)}"></div></div>
+        <div class="ag-scroll">${AG_DURS.map(m=>`<button class="chip" data-ag="dur" data-v="${m}">${fmtDur(m)}</button>`).join("")}</div>
+        <div class="row2"><div><span class="ag-lbl">Lokasi</span><input class="field" id="agL" type="text" maxlength="80" autocomplete="off" placeholder="mis. Kantor" value="${esc(f.loc)}"></div>
+          <div><span class="ag-lbl">Prioritas</span><select class="field" id="agP">${AG_PRIO.map((p,i)=>`<option value="${i}" ${f.prio===String(i)?"selected":""}>${p}</option>`).join("")}</select></div></div>
+        <span class="ag-lbl">Catatan</span>
+        <input class="field" id="agN" type="text" maxlength="200" autocomplete="off" placeholder="Catatan (opsional)" value="${esc(f.note)}">
+        <div class="row2 ${ed?"hide":""}"><div><span class="ag-lbl">Ulangi</span><select class="field" id="agR"><option value="0" ${f.rep==="0"?"selected":""}>Tidak diulang</option><option value="1" ${f.rep==="1"?"selected":""}>Setiap hari</option><option value="7" ${f.rep==="7"?"selected":""}>Setiap minggu</option></select></div>
+          <div><span class="ag-lbl">Berapa kali</span><input class="field" id="agC" type="number" inputmode="numeric" min="2" max="60" value="${esc(f.cnt)}"></div></div>
+        <button class="btn primary" id="agSave">${ed?"Simpan perubahan":"➕ Tambah agenda"}</button>
+        ${ed?`<button class="btn" data-ag="cancel">Batal ubah</button>`:""}
+      </div>
+    </div>
+    <div class="card">
+      <h2>Daftar agenda</h2>
+      ${filt}
+      ${items || `<div class="empty"><big>🗒️</big>${total?"Tidak ada agenda di jenis ini.":"Belum ada agenda.<br>Tambahkan di atas."}</div>`}
+      ${(total-done>0 || done>0)?`<div class="twin">
+        ${total-done>0?`<button class="btn" data-ag="move">➡️ Pindah sisa ke besok</button>`:"<span></span>"}
+        ${done>0?`<button class="btn" data-ag="clear">🧹 Hapus yang selesai</button>`:"<span></span>"}</div>`:""}
+    </div>
+    <button class="btn" style="width:100%" data-ag="back">← Kembali ke Kalender</button>`;
+}
+function bindAgenda(){
+  $("#agSave").onclick = agSave;
+  ["agT","agH","agD","agL","agN"].forEach(i=>{ const el=$("#"+i); if(el) el.onkeydown = e=>{ if(e.key==="Enter"){ e.preventDefault(); agSave(); } }; });
+}
+function agSave(){
+  const title=$("#agT").value.trim();
+  if(!title){ toast("Isi nama kegiatan dulu"); return; }
+  const v={title, cat:agCat, time:$("#agH").value, dur:Math.max(0,Math.min(1440,parseInt($("#agD").value)||0)),
+    loc:$("#agL").value.trim(), prio:+$("#agP").value||0, note:$("#agN").value.trim()};
+  S.agenda = S.agenda||[];
+  if(agEdit){ const a=S.agenda.find(x=>x.id===agEdit); if(a) Object.assign(a,v); agEdit=null; toast("Agenda diperbarui ✓"); }
+  else {
+    const step=+$("#agR").value||0, n=step ? Math.max(2,Math.min(60,parseInt($("#agC").value)||2)) : 1;
+    for(let i=0;i<n;i++) S.agenda.push({id:uid(), date:shiftDay(agDate,i*step), done:false, ...v});
+    toast(n>1 ? `${n} agenda ditambahkan ✓` : "Agenda ditambahkan ✓");
+    agForm = {title:"",time:"",dur:"",loc:"",prio:"0",note:"",rep:"0",cnt:"4"};
+  }
+  save(); render(true);
+}
+$("#agBtn").onclick = ()=>{
+  if(S.tab==="agenda"){ agEdit=null; S.tab="cal"; render(); return; }
+  if(draft && !draft.id) draft=null;
+  agDate=todayIso(); agCur={y:new Date().getFullYear(), m:new Date().getMonth()}; agEdit=null; S.tab="agenda"; render();
+};
+function agGoDay(ds){ agDate=ds; const x=parse(ds); agCur={y:x.getFullYear(), m:x.getMonth()}; agEdit=null; }
+document.addEventListener("click", e=>{
+  const t=e.target.closest("[data-ag]"); if(!t) return;
+  const D=t.dataset, id=D.id; S.agenda=S.agenda||[];
+  if(D.ag==="cat"){ agCat=D.k; document.querySelectorAll("#agCats .chip").forEach(b=>b.classList.toggle("on", b.dataset.k===agCat)); return; }
+  if(D.ag==="dur"){ const el=$("#agD"); if(el) el.value=D.v; return; }
+  agSync();
+  if(D.ag==="mnav"){ agCur.m+=+D.n; if(agCur.m<0){agCur.m=11;agCur.y--;} if(agCur.m>11){agCur.m=0;agCur.y++;} render(true); }
+  else if(D.ag==="day"){ agGoDay(D.d); render(true); }
+  else if(D.ag==="today"){ agGoDay(todayIso()); render(true); }
+  else if(D.ag==="filter"){ agFilter=D.k; render(true); }
+  else if(D.ag==="toggle"){ const a=S.agenda.find(x=>x.id===id); if(a){ a.done=!a.done; save(); render(true); } }
+  else if(D.ag==="edit"){ const a=S.agenda.find(x=>x.id===id); if(a){ agEdit=id; agCat=a.cat||"lainnya"; render(); } }
+  else if(D.ag==="cancel"){ agEdit=null; render(true); }
+  else if(D.ag==="del"){ const a=S.agenda.find(x=>x.id===id); if(!a) return;
+    confirmBox("Hapus agenda ini?", `${esc(a.title)} · ${a.date}. Tindakan ini tidak bisa dibatalkan.`,
+      ()=>{ S.agenda=S.agenda.filter(x=>x.id!==id); if(agEdit===id) agEdit=null; save(); render(true); toast("Agenda dihapus"); }); }
+  else if(D.ag==="move"){ const nx=shiftDay(agDate,1); let n=0;
+    S.agenda.forEach(a=>{ if(a.date===agDate && !a.done){ a.date=nx; n++; } });
+    if(n){ save(); render(true); toast(`${n} agenda dipindah ke besok ✓`); } }
+  else if(D.ag==="clear"){ const n=S.agenda.filter(a=>a.date===agDate && a.done).length; if(!n) return;
+    confirmBox("Hapus agenda selesai?", `${n} agenda yang sudah selesai di tanggal ini akan dihapus.`,
+      ()=>{ S.agenda=S.agenda.filter(a=>!(a.date===agDate && a.done)); save(); render(true); toast("Agenda selesai dihapus"); }); }
+  else if(D.ag==="back"){ S.tab="cal"; render(); }
+});
 
 /* ================= Tombol pasang aplikasi ================= */
 let deferredInstall = null;
