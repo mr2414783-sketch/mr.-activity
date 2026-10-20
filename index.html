@@ -161,6 +161,10 @@ nav button.on{color:var(--accent)} nav button.on .e{filter:none;opacity:1}
 .sheet .btns{display:flex;gap:10px;margin-top:18px}
 .sheet .btns .btn{flex:1;padding:13px}
 .danger{background:var(--bad);color:#fff;border:0}
+.inst{display:flex;align-items:center;gap:12px;margin:16px 0 0;padding:12px 14px;border-radius:20px;background:var(--accent-soft);border-color:var(--accent)}
+.inst .t{flex:1;min-width:0;font-weight:800;font-size:15px;line-height:1.3}
+.inst .t small{display:block;color:var(--muted);font-weight:700;font-size:12px;margin-top:2px}
+.inst .btn{flex:none;background:var(--accent);color:#fff;border:0;padding:11px 16px}
 .hide{display:none!important}
 </style>
 </head>
@@ -176,6 +180,11 @@ nav button.on{color:var(--accent)} nav button.on .e{filter:none;opacity:1}
     <button class="pill" id="themeBtn" aria-label="Ganti tema">🌙</button>
   </div>
 </header>
+
+<div class="wrap"><div class="card inst hide" id="installBar">
+  <div class="t">📲 Pasang di HP<small>Buka seperti aplikasi, bisa tanpa internet</small></div>
+  <button class="btn" id="installBtn">⬇️ Pasang</button>
+</div></div>
 
 <main class="wrap" id="view"></main>
 
@@ -731,6 +740,31 @@ function drawRoutineSheet(){
 }
 
 let tt; function toast(m){ const t=$("#toast"); t.textContent=m; t.classList.add("show"); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove("show"),2300); }
+
+/* ================= Tombol pasang aplikasi ================= */
+let deferredInstall = null;
+const isStandalone = ()=> (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone===true;
+const isIOS = ()=> /iphone|ipad|ipod/i.test(navigator.userAgent);
+function installedFlag(v){ try{ if(v===undefined) return localStorage.getItem("mr-installed")==="1"; if(v) localStorage.setItem("mr-installed","1"); else localStorage.removeItem("mr-installed"); }catch(e){} return false; }
+function updInstall(){ $("#installBar").classList.toggle("hide", isStandalone() || installedFlag()); }
+function markInstalled(){ deferredInstall=null; installedFlag(true); updInstall(); }
+addEventListener("beforeinstallprompt", e=>{ e.preventDefault(); deferredInstall=e; installedFlag(false); updInstall(); });
+addEventListener("appinstalled", ()=>{ markInstalled(); toast("Aplikasi terpasang ✓"); });
+$("#installBtn").onclick = async ()=>{
+  if(deferredInstall){
+    const p=deferredInstall; deferredInstall=null;
+    try{ p.prompt(); const r=await p.userChoice; if(r && r.outcome==="accepted"){ markInstalled(); toast("Aplikasi terpasang ✓"); } }catch(e){}
+    return;
+  }
+  const steps = isIOS()
+    ? `<li>Buka alamat ini di <b>Safari</b></li><li>Ketuk tombol <b>Bagikan</b> (kotak dengan panah)</li><li>Pilih <b>Tambah ke Layar Utama</b></li>`
+    : `<li>Buka alamat ini di <b>Chrome</b></li><li>Ketuk menu <b>⋮</b> di pojok kanan atas</li><li>Pilih <b>Instal aplikasi</b> (atau <b>Tambahkan ke layar utama</b>)</li>`;
+  openSheet(`<h3>Pasang Mr. Activity</h3><ol style="padding-left:20px;line-height:1.9;font-weight:600">${steps}</ol>
+    <div class="hint">Setelah terpasang, tombol ini hilang otomatis.</div>
+    <div class="btns"><button class="btn ok" id="instOk">Mengerti</button></div>`);
+  $("#sheet").onclick = e=>{ if(e.target.id==="instOk") closeSheet(); };
+};
+updInstall();
 
 render();
 if("serviceWorker" in navigator && location.protocol.startsWith("http")){
