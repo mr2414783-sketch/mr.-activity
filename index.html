@@ -1,0 +1,741 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mr. Activity</title>
+<meta name="theme-color" content="#7b3fe4">
+<meta name="description" content="Kalender jadwal gym dan aktivitas, laporan dan target berat badan. Data hanya di perangkatmu.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="favicon-48.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Mr. Activity">
+<style>
+:root{
+  --bg:#ffffff; --card:#ffffff; --soft:#f6f6f8; --line:#e6e6ea; --text:#17171c; --muted:#6b6b76;
+  --good:#3f8f3f; --bad:#d64545; --info:#eef4ff; --warn:#fdf2e4;
+  --accent:#7b3fe4; --accent2:#ff7a45; --accent-soft:#f1eaff;
+}
+:root[data-theme="dark"]{
+  --bg:#101014; --card:#17171d; --soft:#1e1e26; --line:#2b2b35; --text:#f1f1f5; --muted:#9a9aa8;
+  --good:#6fcf6f; --bad:#ff7070; --info:#1a2336; --warn:#33291a; --accent:#a27bf5; --accent-soft:#261c40;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--text);
+  font-family:"Nunito","Segoe UI",system-ui,-apple-system,Roboto,sans-serif}
+body{min-height:100vh;padding-bottom:calc(88px + env(safe-area-inset-bottom))}
+button,input,select,textarea{font:inherit;color:inherit}
+.wrap{max-width:560px;margin:0 auto;padding:0 16px}
+
+header{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--line);
+  padding:calc(12px + env(safe-area-inset-top)) 0 12px}
+.head{display:flex;align-items:center;gap:10px}
+.brand{flex:1;min-width:0}
+.brand h1{margin:0;font-size:22px;line-height:1.1;font-weight:800;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.brand h1 img{width:30px;height:30px;border-radius:9px;flex:none}
+.brand h1 span{background:linear-gradient(90deg,var(--accent2),var(--accent));-webkit-background-clip:text;background-clip:text;color:transparent}
+.brand small{display:block;color:var(--muted);font-size:12px;margin-top:3px;font-weight:600}
+.pill{border:1px solid var(--line);background:var(--card);border-radius:16px;height:44px;min-width:44px;padding:0 13px;flex:none;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:19px;font-weight:800}
+.pill.txt{font-size:14px}
+
+.month{display:flex;align-items:center;justify-content:space-between;margin:16px 0}
+.month b{font-size:21px;font-weight:800}
+.round{width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:var(--card);font-size:20px;cursor:pointer}
+
+.card{border:1px solid var(--line);border-radius:26px;padding:16px;background:var(--card);margin-bottom:16px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.stat{background:var(--soft);border-radius:18px;padding:12px 14px;min-width:0}
+.stat small{display:block;color:var(--muted);font-weight:700;font-size:13px}
+.stat b{display:block;font-size:23px;margin-top:2px;font-weight:800;white-space:nowrap}
+.good{color:var(--good)} .bad{color:var(--bad)} .accent{color:var(--accent)}
+.note{border-radius:18px;padding:13px 16px;font-size:15px;line-height:1.55;margin-top:10px;font-weight:600}
+.note.info{background:var(--info)} .note.warn{background:var(--warn)}
+h2{font-size:20px;margin:2px 0 6px;font-weight:800}
+.sub{color:var(--muted);font-weight:700;font-size:13px;margin-bottom:6px}
+.hint{color:var(--muted);font-size:13px;font-weight:600;line-height:1.5}
+
+/* kalender */
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal .wd{text-align:center;font-size:12px;font-weight:800;color:var(--muted);padding:2px 0 4px}
+.day{border:1.5px solid transparent;border-radius:14px;background:var(--soft);display:flex;flex-direction:column;align-items:center;
+  padding:5px 0 5px;cursor:pointer;font-weight:700;font-size:14px;min-width:0;min-height:58px;color:var(--text)}
+.day.out{background:transparent;cursor:default}
+.day.sel{border-color:var(--accent);background:var(--accent-soft)}
+.day .n{width:25px;height:25px;display:grid;place-items:center;border-radius:50%}
+.day.today .n{background:var(--accent);color:#fff}
+.dots{display:flex;gap:2px;flex-wrap:wrap;justify-content:center;margin-top:4px;padding:0 3px;max-width:100%}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--c)}
+.dot.plan{background:transparent;border:1.5px solid var(--c)}
+.dot.rt{background:transparent;border:1.5px dashed var(--c);opacity:.8}
+.more{font-size:9px;color:var(--muted);line-height:7px}
+.day.w::after{content:"";width:13px;height:3px;border-radius:2px;background:var(--good);margin-top:auto}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:12px;color:var(--muted);font-size:12px;font-weight:700}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend i{display:inline-block;width:8px;height:8px;border-radius:50%}
+
+/* daftar */
+.item{display:grid;grid-template-columns:44px 1fr auto;column-gap:12px;row-gap:8px;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}
+.item:last-child{border-bottom:0}
+.item .actions{grid-column:2 / 4;justify-content:flex-end}
+.ico{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:22px;flex:none;background:var(--soft)}
+.meta{min-width:0}
+.meta b{display:block;font-size:17px;font-weight:800;overflow-wrap:anywhere}
+.meta small{color:var(--muted);font-weight:700}
+.detail{grid-column:2 / 4;white-space:pre-line;color:var(--muted);font-size:14px;font-weight:600;line-height:1.5;background:var(--soft);border-radius:12px;padding:8px 12px}
+.val{font-weight:800;color:var(--accent);text-align:right;font-size:15px;white-space:nowrap}
+.val small{display:block;color:var(--muted);font-weight:700;font-size:12px}
+.badge{display:inline-block;font-size:11px;font-weight:800;padding:2px 8px;border-radius:99px;margin-left:6px;vertical-align:middle}
+.badge.plan{background:var(--warn);color:#b36a00} .badge.done{background:#e5f5e5;color:#2d7a2d} .badge.rt{background:var(--info);color:#2f5fb3}
+:root[data-theme="dark"] .badge.done{background:#1d3320;color:#7bdc7b}
+:root[data-theme="dark"] .badge.plan{color:#f0b35a}
+:root[data-theme="dark"] .badge.rt{color:#8fb4ff}
+.btn{border:1px solid var(--line);background:var(--card);border-radius:14px;padding:10px 14px;font-weight:700;cursor:pointer;font-size:14px}
+.btn.primary{background:linear-gradient(90deg,var(--accent2),var(--accent));color:#fff;border:0;width:100%;padding:15px;font-size:16px;border-radius:18px}
+.btn.sm{padding:8px 12px;border-radius:12px}
+.btn.ok{background:var(--accent);color:#fff;border-color:var(--accent)}
+.actions{display:flex;gap:6px;flex:none;flex-wrap:wrap}
+.empty{text-align:center;color:var(--muted);padding:20px 8px;font-weight:600;line-height:1.6}
+.empty big{font-size:38px;display:block;margin-bottom:6px}
+.twin{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+
+/* jadwal mingguan */
+.wk{display:grid;grid-template-columns:48px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);align-items:start}
+.wk:last-child{border-bottom:0}
+.wk b{font-size:15px;padding-top:7px}
+.wk.td b{color:var(--accent)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.rc{border:1.5px solid var(--c);color:var(--text);background:var(--card);border-radius:99px;padding:6px 8px 6px 11px;font-size:13px;font-weight:700;cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+.rc u{text-decoration:none;color:var(--muted);font-size:15px;line-height:1}
+.rc.add{border-style:dashed;border-color:var(--line);color:var(--muted);padding:6px 12px}
+
+/* form */
+label{display:block;font-weight:800;font-size:14px;margin:14px 0 6px}
+.field{width:100%;border:1px solid var(--line);background:var(--soft);border-radius:14px;padding:13px 14px;font-size:16px;min-width:0}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.seg{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--card);border-radius:99px;padding:9px 15px;font-weight:700;cursor:pointer;font-size:14px}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.chip.act.on{background:var(--c);border-color:var(--c)}
+
+/* progres & grafik */
+.prog{height:12px;background:var(--soft);border-radius:99px;overflow:hidden;margin:8px 0 4px;border:1px solid var(--line)}
+.prog i{display:block;height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:99px}
+.rowb{display:flex;justify-content:space-between;gap:8px;font-weight:700;font-size:14px}
+.rowb small{color:var(--muted);font-weight:700}
+.bars{display:flex;align-items:flex-end;gap:10px;height:140px;margin:12px 0 4px}
+.bar{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:6px}
+.bar i{display:block;width:100%;border-radius:10px 10px 4px 4px;background:linear-gradient(180deg,var(--accent2),var(--accent));min-height:4px}
+.bar span{font-size:12px;color:var(--muted);font-weight:700}
+.bar em{font-style:normal;font-size:12px;font-weight:800}
+.catbox{display:grid;gap:6px;margin-top:4px}
+.crow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;border-radius:14px;background:var(--soft);font-weight:700;font-size:14px;border:1.5px solid transparent}
+.crow small{color:var(--muted);font-weight:700;font-size:12px}
+.crow.on{background:var(--accent-soft);border-color:var(--accent)}
+svg.chart{width:100%;height:auto;display:block}
+.g-line{stroke:var(--accent);fill:none;stroke-width:2.5;stroke-linejoin:round;stroke-linecap:round}
+.g-area{fill:var(--accent);opacity:.13}
+.g-grid{stroke:var(--line);stroke-width:1}
+.g-txt{fill:var(--muted);font-size:10px;font-weight:700}
+.g-tgt{stroke:var(--good);stroke-width:1.5;stroke-dasharray:5 4}
+.g-tgt-t{fill:var(--good);font-size:10px;font-weight:800}
+.g-pt{fill:var(--card);stroke:var(--accent);stroke-width:2}
+.g-last{fill:var(--accent)}
+.g-val{fill:var(--text);font-size:11px;font-weight:800}
+
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--line);z-index:30;padding-bottom:env(safe-area-inset-bottom)}
+nav .in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+nav button{border:0;background:none;padding:9px 0 8px;cursor:pointer;color:var(--muted);font-weight:700;font-size:13px}
+nav button .e{display:block;font-size:25px;filter:grayscale(.9);opacity:.7;margin-bottom:2px}
+nav button.on{color:var(--accent)} nav button.on .e{filter:none;opacity:1}
+
+#toast{position:fixed;left:50%;bottom:calc(98px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(20px);
+  background:#222;color:#fff;padding:11px 18px;border-radius:99px;font-weight:700;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:60;max-width:90%;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:50;display:none;align-items:flex-end;justify-content:center}
+.modal.show{display:flex}
+.sheet{background:var(--bg);width:100%;max-width:560px;border-radius:26px 26px 0 0;padding:22px 18px calc(22px + env(safe-area-inset-bottom));max-height:88vh;overflow:auto}
+.sheet h3{margin:0 0 4px;font-size:20px}
+.sheet .btns{display:flex;gap:10px;margin-top:18px}
+.sheet .btns .btn{flex:1;padding:13px}
+.danger{background:var(--bad);color:#fff;border:0}
+.hide{display:none!important}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap head">
+    <div class="brand">
+      <h1><img src="icon-192.png" alt=""><span>Mr. Activity</span></h1>
+      <small>Data hanya di perangkatmu</small>
+    </div>
+    <button class="pill txt" id="todayBtn">Hari ini</button>
+    <button class="pill" id="themeBtn" aria-label="Ganti tema">🌙</button>
+  </div>
+</header>
+
+<main class="wrap" id="view"></main>
+
+<nav><div class="in" id="nav">
+  <button data-t="cal" class="on"><span class="e">📅</span>Kalender</button>
+  <button data-t="add"><span class="e">➕</span>Catat</button>
+  <button data-t="bb"><span class="e">⚖️</span>Berat</button>
+  <button data-t="report"><span class="e">📊</span>Laporan</button>
+</div></nav>
+
+<div id="toast"></div>
+<div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
+
+<script>
+"use strict";
+/* ================= Konfigurasi aktivitas ================= */
+const ACTS = {
+  gym:   {name:"Gym",   emoji:"🏋️", c:"#7b3fe4", types:["Push","Pull","Legs","Full Body","Cardio","Core"],
+          metric:{label:"Total beban", unit:"kg", ph:"mis. 4500", step:"1"},
+          extra:{label:"Jumlah set", ph:"mis. 18"},
+          detail:{label:"Daftar gerakan", ph:"Bench press 4x10 60kg\nIncline DB press 3x12 22kg"}},
+  lari:  {name:"Lari",  emoji:"🏃", c:"#e8590c", types:["Easy Run","Interval","Tempo","Long Run","Recovery"],
+          metric:{label:"Jarak", unit:"km", ph:"mis. 5.2", step:"0.01"},
+          extra:{label:"Pace (menit/km)", ph:"mis. 6:10"},
+          detail:{label:"Rute / catatan", ph:"Rute GBK 2 putaran"}},
+  yoga:  {name:"Yoga",  emoji:"🧘", c:"#12a594", types:["Vinyasa","Hatha","Yin","Power","Meditasi"],
+          metric:{label:"Jumlah pose", unit:"pose", ph:"mis. 20", step:"1"},
+          extra:{label:"Level napas (1-5)", ph:"mis. 3"},
+          detail:{label:"Daftar pose", ph:"Sun salutation x5\nWarrior II"}},
+  renang:{name:"Renang",emoji:"🏊", c:"#1c7ed6", types:["Gaya Bebas","Gaya Dada","Gaya Punggung","Kupu-kupu","Campuran"],
+          metric:{label:"Jumlah lap", unit:"lap", ph:"mis. 24", step:"1"},
+          extra:{label:"Panjang kolam (m)", ph:"mis. 25"},
+          detail:{label:"Set latihan", ph:"Pemanasan 4 lap\n6 x 2 lap interval"}},
+  futsal:{name:"Futsal",emoji:"⚽", c:"#2f9e44", types:["Main Bareng","Latihan","Pertandingan","Turnamen"],
+          metric:{label:"Gol / assist", unit:"poin", ph:"mis. 3", step:"1"},
+          extra:{label:"Lokasi", ph:"mis. GOR Satria"},
+          detail:{label:"Catatan main", ph:"Main 2 babak, lawan tim kantor"}},
+};
+const DAYS = ["Min","Sen","Sel","Rab","Kam","Jum","Sab"];
+const DAYSF = ["Minggu","Senin","Selasa","Rabu","Kamis","Jumat","Sabtu"];
+const MONTHS = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+const MON_S = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
+const WD_ORDER = [1,2,3,4,5,6,0];
+
+/* ================= State ================= */
+const KEY = "mr-activity-v2";
+function norm(d){
+  return {records:d.records||[], routine:d.routine||{}, weights:d.weights||[],
+    goals:Object.assign({week:4, minutes:600, targetKg:"", startKg:"", height:"", sex:""}, d.goals||{}),
+    theme:d.theme||null, tab:"cal"};
+}
+function load(){
+  try{ const d=JSON.parse(localStorage.getItem(KEY)); if(d && Array.isArray(d.records)) return norm(d); }catch(e){}
+  try{ const o=JSON.parse(localStorage.getItem("mr-activity-v1"));
+    if(o && Array.isArray(o.records)) return norm({records:o.records.map(r=>({...r,time:"",detail:r.note||""})), theme:o.theme}); }catch(e){}
+  return norm({});
+}
+let S = load();
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){ toast("Penyimpanan penuh atau diblokir"); } }
+
+const pad = n=>String(n).padStart(2,"0");
+const iso = d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const parse = s=>new Date(s+"T00:00:00");
+const todayIso = ()=>iso(new Date());
+const esc = s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt = n=>Number(n).toLocaleString("id-ID",{maximumFractionDigits:2});
+const fmt1 = n=>Number(n).toLocaleString("id-ID",{maximumFractionDigits:1});
+const uid = ()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const $ = s=>document.querySelector(s);
+
+let cur = {y:new Date().getFullYear(), m:new Date().getMonth()};
+let sel = todayIso();
+let draft = null;
+let rdraft = null;
+let wRange = 30;
+let wDate = todayIso();
+
+function weekStart(d){ const x=new Date(d); x.setHours(0,0,0,0); x.setDate(x.getDate()-((x.getDay()+6)%7)); return x; }
+function recsOn(d){ return S.records.filter(r=>r.date===d).sort((a,b)=>(a.time||"99:99").localeCompare(b.time||"99:99")||a.id.localeCompare(b.id)); }
+function routineOn(d){
+  if(d<todayIso()) return [];
+  const wd=parse(d).getDay();
+  return (S.routine[wd]||[]).filter(x=>!S.records.some(r=>r.date===d&&r.act===x.act&&r.type===x.type))
+    .sort((a,b)=>(a.time||"99:99").localeCompare(b.time||"99:99"));
+}
+function weightOn(d){ return S.weights.find(w=>w.date===d); }
+function weightsAsc(){ return [...S.weights].sort((a,b)=>a.date.localeCompare(b.date)); }
+
+/* ================= Tema ================= */
+function applyTheme(){
+  const dark = S.theme ? S.theme==="dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  document.documentElement.dataset.theme = dark ? "dark" : "light";
+  $("#themeBtn").textContent = dark ? "☀️" : "🌙";
+  document.querySelector('meta[name="theme-color"]').content = dark ? "#101014" : "#7b3fe4";
+}
+
+/* ================= Render ================= */
+function render(keepScroll){
+  applyTheme();
+  document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on", b.dataset.t===S.tab));
+  const y = window.scrollY;
+  $("#view").innerHTML = ({cal:viewCal, add:viewAdd, bb:viewBB, report:viewReport})[S.tab]();
+  if(S.tab==="add") bindAdd();
+  if(S.tab==="bb") bindBB();
+  if(S.tab==="report") bindReport();
+  window.scrollTo(0, keepScroll ? y : 0);
+}
+function monthNav(){
+  return `<div class="month"><button class="round" data-nav="-1" aria-label="Bulan lalu">‹</button>
+    <b>${MONTHS[cur.m]} ${cur.y}</b><button class="round" data-nav="1" aria-label="Bulan depan">›</button></div>`;
+}
+const monthKey = ()=>`${cur.y}-${pad(cur.m+1)}`;
+
+/* ---------- Kalender ---------- */
+function viewCal(){
+  const mk = monthKey(), mr = S.records.filter(r=>r.date.startsWith(mk));
+  const done = mr.filter(r=>r.status==="done").length, plan = mr.filter(r=>r.status==="plan").length;
+  const t = todayIso();
+
+  const ws = weekStart(new Date()), we = new Date(ws); we.setDate(we.getDate()+7);
+  const wkDone = S.records.filter(r=>r.status==="done" && parse(r.date)>=ws && parse(r.date)<we).length;
+  const gw = +S.goals.week||1, pct = Math.min(100, Math.round(wkDone/gw*100));
+  const info = wkDone>=gw ? `Target minggu ini tercapai: ${wkDone} dari ${gw} sesi. Mantap, pertahankan!`
+    : `Minggu ini ${wkDone} dari ${gw} sesi (${pct}%). Sisa ${gw-wkDone} sesi lagi.`;
+  const todayItems = recsOn(t).filter(r=>r.status==="plan").length + routineOn(t).length;
+  const late = S.records.filter(r=>r.status==="plan" && r.date<t).length;
+  let warn = "";
+  if(todayItems) warn = `<div class="note warn">⏰ Hari ini ada ${todayItems} sesi yang belum selesai</div>`;
+  else if(late) warn = `<div class="note warn">⚠️ ${late} sesi terjadwal sudah lewat dan belum ditandai selesai</div>`;
+
+  const first = new Date(cur.y,cur.m,1), off=(first.getDay()+6)%7, nd=new Date(cur.y,cur.m+1,0).getDate();
+  let cells = ["Sen","Sel","Rab","Kam","Jum","Sab","Min"].map(d=>`<div class="wd">${d}</div>`).join("");
+  for(let i=0;i<off;i++) cells+=`<div class="day out"></div>`;
+  for(let d=1; d<=nd; d++){
+    const ds=`${mk}-${pad(d)}`;
+    const dots=[];
+    recsOn(ds).forEach(r=>dots.push(`<i class="dot ${r.status==="plan"?"plan":""}" style="--c:${ACTS[r.act].c}"></i>`));
+    routineOn(ds).forEach(x=>dots.push(`<i class="dot rt" style="--c:${ACTS[x.act].c}"></i>`));
+    const shown = dots.slice(0,4).join("") + (dots.length>4?`<span class="more">+${dots.length-4}</span>`:"");
+    cells+=`<button class="day ${ds===sel?"sel":""} ${ds===t?"today":""} ${weightOn(ds)?"w":""}" data-day="${ds}" aria-label="${d} ${MONTHS[cur.m]}"><span class="n">${d}</span><span class="dots">${shown}</span></button>`;
+  }
+  const legend = Object.values(ACTS).map(a=>`<span><i style="background:${a.c}"></i>${a.name}</span>`).join("");
+
+  return `${monthNav()}
+  <div class="card">
+    <div class="grid2">
+      <div class="stat"><small>Sesi selesai</small><b class="good">${done}</b></div>
+      <div class="stat"><small>Terjadwal</small><b class="accent">${plan}</b></div>
+    </div>
+    <div class="note info" style="margin-top:0">${info}</div>
+    ${warn}
+  </div>
+  <div class="card">
+    <div class="cal">${cells}</div>
+    <div class="legend">${legend}</div>
+    <div class="legend"><span>● selesai</span><span>○ terjadwal</span><span>◌ rutin mingguan</span><span><i style="background:var(--good);border-radius:2px;width:12px;height:4px"></i>BB tercatat</span></div>
+  </div>
+  ${dayCard()}
+  ${routineCard()}`;
+}
+
+function recHtml(r){
+  const a = ACTS[r.act];
+  const val = r.metric!=="" && r.metric!=null ? `${fmt(r.metric)} ${a.metric.unit}` : "";
+  const sub = [a.name, r.time, r.dur?`${r.dur} mnt`:""].filter(Boolean).join(" · ");
+  return `<div class="item">
+    <div class="ico" style="background:${a.c}22">${a.emoji}</div>
+    <div class="meta"><b>${esc(r.type)}<span class="badge ${r.status}">${r.status==="done"?"Selesai":"Terjadwal"}</span></b><small>${esc(sub)}</small></div>
+    <div class="val">${val}${r.extra?`<small>${esc(r.extra)}</small>`:""}</div>
+    ${r.detail?`<div class="detail">${esc(r.detail)}</div>`:""}
+    <div class="actions">
+      ${r.status==="plan"?`<button class="btn sm ok" data-done="${r.id}">✓ Selesai</button>`:""}
+      <button class="btn sm" data-edit="${r.id}">Edit</button>
+      <button class="btn sm" data-del="${r.id}">Hapus</button>
+    </div></div>`;
+}
+function rtHtml(x, ds){
+  const a = ACTS[x.act];
+  return `<div class="item">
+    <div class="ico" style="background:${a.c}22">${a.emoji}</div>
+    <div class="meta"><b>${esc(x.type)}<span class="badge rt">Rutin</span></b><small>${esc([a.name, x.time].filter(Boolean).join(" · "))}</small></div>
+    <div></div>
+    <div class="actions"><button class="btn sm ok" data-rdone="${ds}|${x.id}">✓ Selesai</button></div></div>`;
+}
+function dayCard(){
+  const d = parse(sel), isT = sel===todayIso();
+  const rs = recsOn(sel), rt = routineOn(sel), w = weightOn(sel);
+  const body = (rs.length||rt.length) ? rs.map(recHtml).join("")+rt.map(x=>rtHtml(x,sel)).join("")
+    : `<div class="empty"><big>🗓️</big>Belum ada jadwal di tanggal ini.</div>`;
+  return `<div class="card">
+    <h2>${DAYSF[d.getDay()]}, ${d.getDate()} ${MONTHS[d.getMonth()]}</h2>
+    <div class="sub">${isT?"Hari ini":sel<todayIso()?"Sudah lewat":"Akan datang"}${w?` · ⚖️ ${fmt1(w.kg)} kg`:""}</div>
+    ${body}
+    <div class="twin"><button class="btn" data-addday="1">➕ Tambah sesi</button><button class="btn" data-wday="1">⚖️ Catat BB</button></div>
+  </div>`;
+}
+function routineCard(){
+  const tw = new Date().getDay();
+  const rows = WD_ORDER.map(wd=>{
+    const items = (S.routine[wd]||[]).slice().sort((a,b)=>(a.time||"99").localeCompare(b.time||"99"));
+    const chips = items.map(x=>`<span class="rc" style="--c:${ACTS[x.act].c}" data-rdel="${wd}|${x.id}">${ACTS[x.act].emoji} ${esc(x.type)}${x.time?` · ${esc(x.time)}`:""} <u>×</u></span>`).join("");
+    return `<div class="wk ${wd===tw?"td":""}"><b>${DAYS[wd]}</b><div class="chips">${chips}<span class="rc add" data-radd="${wd}">+ Tambah</span></div></div>`;
+  }).join("");
+  return `<div class="card"><h2>Jadwal mingguan</h2>
+    <div class="hint" style="margin-bottom:6px">Latihan rutin tiap pekan. Otomatis muncul di kalender mulai hari ini ke depan.</div>${rows}</div>`;
+}
+
+/* ---------- Catat ---------- */
+function newDraft(){
+  const t=todayIso();
+  return {act:(draft&&draft.act)||"gym", type:null, date:sel, time:"", dur:"", metric:"", extra:"", detail:"", status: sel>t?"plan":"done"};
+}
+function viewAdd(){
+  if(!draft || draft._keep) draft = newDraft();
+  const d = draft, a = ACTS[d.act];
+  if(!d.type || !a.types.includes(d.type)) d.type = a.types[0];
+  const acts = Object.entries(ACTS).map(([k,v])=>`<button class="chip act ${k===d.act?"on":""}" style="--c:${v.c}" data-pact="${k}">${v.emoji} ${v.name}</button>`).join("");
+  return `<div class="card" style="margin-top:16px">
+    <h2>${d.id?"Edit sesi":"Catat sesi"}</h2>
+    <label style="margin-top:10px">Aktivitas</label><div class="seg">${acts}</div>
+    <label>Jenis ${a.name}</label>
+    <div class="seg" id="types">${a.types.map(t=>`<button class="chip ${t===d.type?"on":""}" data-type="${esc(t)}">${esc(t)}</button>`).join("")}</div>
+    <label>Status</label>
+    <div class="seg" id="status">
+      <button class="chip ${d.status==="done"?"on":""}" data-st="done">Sudah selesai</button>
+      <button class="chip ${d.status==="plan"?"on":""}" data-st="plan">Jadwalkan</button>
+    </div>
+    <div class="row2">
+      <div><label for="fDate">Tanggal</label><input class="field" id="fDate" type="date" value="${d.date}"></div>
+      <div><label for="fTime">Jam</label><input class="field" id="fTime" type="time" value="${esc(d.time)}"></div>
+    </div>
+    <div class="row2">
+      <div><label for="fDur">Durasi (menit)</label><input class="field" id="fDur" type="number" inputmode="numeric" min="0" placeholder="mis. 60" value="${esc(d.dur)}"></div>
+      <div><label for="fMet">${esc(a.metric.label)} (${a.metric.unit})</label><input class="field" id="fMet" type="number" inputmode="decimal" step="${a.metric.step}" min="0" placeholder="${a.metric.ph}" value="${esc(d.metric)}"></div>
+    </div>
+    <label for="fExtra">${esc(a.extra.label)}</label><input class="field" id="fExtra" type="text" placeholder="${esc(a.extra.ph)}" value="${esc(d.extra)}">
+    <label for="fDetail">${esc(a.detail.label)}</label><textarea class="field" id="fDetail" rows="4" placeholder="${esc(a.detail.ph)}">${esc(d.detail)}</textarea>
+    <div style="margin-top:18px"><button class="btn primary" id="saveBtn">${d.id?"Simpan perubahan":"Simpan"}</button></div>
+    ${d.id?`<div style="margin-top:10px"><button class="btn" id="cancelEdit" style="width:100%;padding:13px">Batal</button></div>`:""}
+  </div>`;
+}
+function syncDraft(){
+  const g=id=>{const e=$("#"+id); return e?e.value:"";};
+  Object.assign(draft,{date:g("fDate"),time:g("fTime"),dur:g("fDur"),metric:g("fMet"),extra:g("fExtra"),detail:g("fDetail")});
+}
+function bindAdd(){
+  $("#view").onclick = e=>{
+    const b=e.target.closest("button"); if(!b) return;
+    if(b.dataset.pact){ syncDraft(); draft.act=b.dataset.pact; draft.type=null; draft.metric=""; draft.extra=""; render(true); }
+    else if(b.dataset.type){ syncDraft(); draft.type=b.dataset.type; render(true); }
+    else if(b.dataset.st){ syncDraft(); draft.status=b.dataset.st; render(true); }
+    else if(b.id==="saveBtn") saveDraft();
+    else if(b.id==="cancelEdit"){ draft=null; S.tab="cal"; render(); }
+  };
+}
+function saveDraft(){
+  syncDraft();
+  if(!draft.date){ toast("Isi tanggalnya dulu"); return; }
+  const rec = {id:draft.id||uid(), act:draft.act, type:draft.type, date:draft.date, time:draft.time, dur:draft.dur, metric:draft.metric, extra:draft.extra.trim(), detail:draft.detail.trim(), status:draft.status};
+  const i = S.records.findIndex(r=>r.id===rec.id);
+  if(i>=0) S.records[i]=rec; else S.records.push(rec);
+  const dt = parse(rec.date); cur={y:dt.getFullYear(), m:dt.getMonth()}; sel=rec.date;
+  const lastAct = draft.act; draft={act:lastAct, _keep:true};
+  S.tab="cal"; save(); render();
+  toast(rec.status==="done" ? "Sesi tersimpan ✓" : "Sesi dijadwalkan ✓");
+}
+
+/* ---------- Berat badan ---------- */
+function bmiCat(b){ return b<18.5?"Kurus":b<25?"Normal":b<30?"Berat berlebih":"Obesitas"; }
+let cWeight = null;
+function calcHtml(h, kg, sex){
+  if(!(h>=100 && h<=230)) return `<div class="hint">Isi tinggi badan (100-230 cm) untuk melihat hasilnya.</div>`;
+  const m=h/100, m2=m*m;
+  const lo=18.5*m2, hi=24.9*m2, mid=22*m2;
+  const rows=[["Kurus","< 18,5",`< ${fmt1(lo)} kg`],["Normal","18,5 - 24,9",`${fmt1(lo)} - ${fmt1(hi)} kg`],
+    ["Berat berlebih","25 - 29,9",`${fmt1(25*m2)} - ${fmt1(29.9*m2)} kg`],["Obesitas","≥ 30",`≥ ${fmt1(30*m2)} kg`]];
+  let head="", bmi=null, cat="";
+  if(kg>=20 && kg<=400){
+    bmi=kg/m2; cat=bmiCat(bmi);
+    let msg;
+    if(kg<lo) msg=`Berat Anda di bawah rentang sehat. Perlu naik sekitar ${fmt1(lo-kg)} kg untuk mencapai batas bawah (${fmt1(lo)} kg).`;
+    else if(kg>hi) msg=`Berat Anda di atas rentang sehat. Perlu turun sekitar ${fmt1(kg-hi)} kg untuk mencapai batas atas (${fmt1(hi)} kg).`;
+    else msg="Berat Anda sudah dalam rentang sehat. Pertahankan.";
+    head=`<div class="grid2"><div class="stat"><small>BMI</small><b>${fmt1(bmi)}</b></div><div class="stat"><small>Kategori</small><b class="${cat==="Normal"?"good":"bad"}" style="font-size:18px;white-space:normal">${cat}</b></div></div><div class="note info" style="margin-top:0">${msg}</div>`;
+  }
+  const table=rows.map(r=>`<div class="crow ${cat===r[0]?"on":""}"><span>${r[0]}<br><small>BMI ${r[1]}</small></span><span style="text-align:right">${r[2]}</span></div>`).join("");
+  let ideal=`<div class="rowb" style="margin-top:14px"><span>Rentang berat sehat</span><small>${fmt1(lo)} - ${fmt1(hi)} kg</small></div>
+    <div class="rowb" style="margin-top:6px"><span>Berat ideal (BMI 22)</span><small>${fmt1(mid)} kg</small></div>`;
+  if(sex){
+    const broca=(h-100)*(sex==="p"?0.85:0.9);
+    const inch=h/2.54-60;
+    const dev=inch>=0 ? (sex==="p"?45.5:50)+2.3*inch : null;
+    ideal+=`<div class="rowb" style="margin-top:6px"><span>Rumus Broca</span><small>${fmt1(broca)} kg</small></div>
+    <div class="rowb" style="margin-top:6px"><span>Rumus Devine</span><small>${dev!=null?fmt1(dev)+" kg":"- (tinggi di bawah 152 cm)"}</small></div>`;
+  } else ideal+=`<div class="hint" style="margin-top:8px">Pilih jenis kelamin untuk melihat rumus Broca dan Devine.</div>`;
+  return `${head}<div class="catbox">${table}</div>${ideal}
+    <div style="margin-top:14px"><button class="btn" style="width:100%" data-settgt="${Math.round(mid*10)/10}">🎯 Jadikan target (${fmt1(mid)} kg)</button></div>
+    <div class="hint" style="margin-top:10px">Acuan WHO untuk dewasa. Hasilnya perkiraan kasar dan kurang pas untuk anak, ibu hamil, atau atlet berotot. Untuk target yang aman, konsultasikan dengan dokter atau ahli gizi.</div>`;
+}
+function chartSvg(list, target){
+  const W=340,H=200,ml=40,mr=14,mt=14,mb=28;
+  const ys=list.map(x=>+x.kg); if(target) ys.push(+target);
+  let lo=Math.min(...ys), hi=Math.max(...ys); if(hi-lo<2){ const m=(hi+lo)/2; lo=m-1; hi=m+1; }
+  const padY=(hi-lo)*0.12; lo-=padY; hi+=padY;
+  const t0=parse(list[0].date).getTime(), t1=parse(list[list.length-1].date).getTime();
+  const X=d=>ml+(t1===t0?(W-ml-mr)/2:(parse(d).getTime()-t0)/(t1-t0)*(W-ml-mr));
+  const Y=v=>mt+(hi-v)/(hi-lo)*(H-mt-mb);
+  let grid=""; for(let i=0;i<4;i++){ const v=lo+(hi-lo)*i/3, y=Y(v); grid+=`<line class="g-grid" x1="${ml}" x2="${W-mr}" y1="${y}" y2="${y}"/><text class="g-txt" x="${ml-6}" y="${y+3}" text-anchor="end">${fmt1(v)}</text>`; }
+  const pts=list.map(x=>`${X(x.date).toFixed(1)},${Y(x.kg).toFixed(1)}`);
+  const line = list.length>1 ? `<polygon class="g-area" points="${X(list[0].date)},${H-mb} ${pts.join(" ")} ${X(list[list.length-1].date)},${H-mb}"/><polyline class="g-line" points="${pts.join(" ")}"/>` : "";
+  const dots=list.map((x,i)=> i===list.length-1 ? "" : (list.length<=40?`<circle class="g-pt" cx="${X(x.date)}" cy="${Y(x.kg)}" r="3"/>`:"")).join("");
+  const L=list[list.length-1], lx=X(L.date), ly=Y(L.kg);
+  const tgt = target ? `<line class="g-tgt" x1="${ml}" x2="${W-mr}" y1="${Y(target)}" y2="${Y(target)}"/><text class="g-tgt-t" x="${W-mr}" y="${Y(target)-5}" text-anchor="end">Target ${fmt1(target)}</text>` : "";
+  const lab=d=>{const x=parse(d); return `${x.getDate()} ${MON_S[x.getMonth()]}`;};
+  const anchorLast = lx>W-60 ? "end" : "middle";
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Grafik berat badan">${grid}${tgt}${line}${dots}
+    <circle class="g-last" cx="${lx}" cy="${ly}" r="5"/><text class="g-val" x="${lx}" y="${ly-10}" text-anchor="${anchorLast}">${fmt1(L.kg)}</text>
+    <text class="g-txt" x="${X(list[0].date)}" y="${H-8}" text-anchor="start">${lab(list[0].date)}</text>
+    ${list.length>1?`<text class="g-txt" x="${W-mr}" y="${H-8}" text-anchor="end">${lab(L.date)}</text>`:""}</svg>`;
+}
+function viewBB(){
+  const all = weightsAsc(), g = S.goals;
+  const tgt = g.targetKg!=="" ? +g.targetKg : null;
+  const latest = all.length ? all[all.length-1] : null;
+  const start = g.startKg!=="" ? +g.startKg : (all.length ? +all[0].kg : null);
+  let ranged = all;
+  if(wRange){ const from = new Date(); from.setDate(from.getDate()-wRange); ranged = all.filter(x=>parse(x.date)>=from); if(!ranged.length && latest) ranged=[latest]; }
+
+  let stats = `<div class="empty"><big>⚖️</big>Belum ada data berat badan.<br>Catat berat pertama Anda di bawah.</div>`, chart="", insight="";
+  if(latest){
+    const diff = start!=null ? latest.kg - start : 0;
+    stats = `<div class="grid2">
+      <div class="stat"><small>Terakhir</small><b>${fmt1(latest.kg)} kg</b></div>
+      <div class="stat"><small>Target</small><b>${tgt!=null?fmt1(tgt)+" kg":"-"}</b></div></div>
+      <div class="grid2" style="margin-bottom:0">
+      <div class="stat"><small>Dari awal (${start!=null?fmt1(start):"-"} kg)</small><b class="${diff<=0?"good":"bad"}">${diff>0?"+":""}${fmt1(diff)} kg</b></div>
+      <div class="stat"><small>${g.height?"BMI":"Dicatat"}</small><b>${g.height?fmt1(latest.kg/Math.pow(g.height/100,2)):all.length+"x"}</b></div></div>`;
+    if(g.height) stats += `<div class="hint" style="margin-top:8px">BMI ${bmiCat(latest.kg/Math.pow(g.height/100,2))} (acuan WHO, hanya perkiraan kasar).</div>`;
+    chart = chartSvg(ranged, tgt);
+
+    const from=new Date(); from.setDate(from.getDate()-28);
+    const rec = all.filter(x=>parse(x.date)>=from);
+    let perWeek=null;
+    if(rec.length>=2){ const days=(parse(rec[rec.length-1].date)-parse(rec[0].date))/864e5; if(days>=7) perWeek=(rec[rec.length-1].kg-rec[0].kg)/(days/7); }
+    let msg;
+    if(tgt==null) msg = "Atur target berat badan di bawah untuk melihat progres dan perkiraan waktunya.";
+    else {
+      const rem = latest.kg - tgt, goingDown = start!=null ? start>tgt : rem>0;
+      const reached = goingDown ? latest.kg<=tgt+0.05 : latest.kg>=tgt-0.05;
+      if(reached) msg = "Target tercapai 🎉 Pertahankan, atau atur target baru.";
+      else {
+        msg = `Sisa ${fmt1(Math.abs(rem))} kg lagi untuk ${goingDown?"turun":"naik"} ke target.`;
+        if(perWeek!=null){
+          const toward = goingDown ? perWeek<0 : perWeek>0;
+          msg += ` Tren 4 minggu: ${perWeek>0?"+":""}${fmt1(perWeek)} kg/minggu.`;
+          if(toward && Math.abs(perWeek)>=0.05) msg += ` Dengan laju ini, sekitar ${Math.ceil(Math.abs(rem)/Math.abs(perWeek))} minggu lagi.`;
+          else msg += " Belum bergerak ke arah target.";
+        }
+      }
+    }
+    let pct=null;
+    if(tgt!=null && start!=null && start!==tgt) pct=Math.max(0,Math.min(100,(start-latest.kg)/(start-tgt)*100));
+    insight = `${pct!=null?`<div style="margin:14px 0 4px"><div class="rowb"><span>Progres ke target</span><small>${Math.round(pct)}%</small></div><div class="prog"><i style="width:${pct}%"></i></div></div>`:""}
+      <div class="note info" style="margin-top:8px">${msg}</div>`;
+  }
+  const hist = all.slice().reverse().slice(0,12).map((x,i,arr)=>{
+    const prev = arr[i+1]; const dl = prev? x.kg-prev.kg : null; const d=parse(x.date);
+    return `<div class="item" style="grid-template-columns:1fr auto auto;padding:10px 0">
+      <div class="meta"><b style="font-size:16px">${fmt1(x.kg)} kg</b><small>${DAYS[d.getDay()]}, ${d.getDate()} ${MON_S[d.getMonth()]} ${d.getFullYear()}</small></div>
+      <div class="val ${dl==null?"":(dl<=0?"good":"bad")}" style="color:${dl==null?"var(--muted)":""}">${dl==null?"":(dl>0?"+":"")+fmt1(dl)}</div>
+      <button class="btn sm" data-wdel="${x.date}">Hapus</button></div>`;
+  }).join("");
+  const ex = weightOn(wDate);
+  return `<div class="card" style="margin-top:16px"><h2>⚖️ Berat badan</h2>${stats}${insight}</div>
+  <div class="card"><h2>Grafik</h2>
+    <div class="seg" id="rng" style="margin:8px 0">${[[30,"30 hari"],[90,"90 hari"],[0,"Semua"]].map(([v,l])=>`<button class="chip ${wRange===v?"on":""}" data-rng="${v}">${l}</button>`).join("")}</div>
+    ${chart||`<div class="empty">Grafik muncul setelah ada data.</div>`}
+  </div>
+  <div class="card"><h2>Kalkulator berat ideal</h2>
+    <div class="hint">Hitung BMI, kategori, dan rentang berat sehat sesuai tinggi badan.</div>
+    <div class="row2">
+      <div><label for="cH">Tinggi (cm)</label><input class="field" id="cH" type="number" inputmode="numeric" min="100" max="230" placeholder="mis. 170" value="${g.height}"></div>
+      <div><label for="cW">Berat (kg)</label><input class="field" id="cW" type="number" inputmode="decimal" step="0.1" min="20" placeholder="mis. 70" value="${cWeight!=null?cWeight:(latest?latest.kg:"")}"></div>
+    </div>
+    <label>Jenis kelamin</label>
+    <div class="seg" id="cSex"><button class="chip ${g.sex==="l"?"on":""}" data-sex="l">Laki-laki</button><button class="chip ${g.sex==="p"?"on":""}" data-sex="p">Perempuan</button></div>
+    <div id="calcOut" style="margin-top:14px">${calcHtml(+g.height, cWeight!=null?+cWeight:(latest?+latest.kg:NaN), g.sex)}</div>
+  </div>
+  <div class="card"><h2>Catat berat</h2>
+    <div class="row2">
+      <div><label for="wD">Tanggal</label><input class="field" id="wD" type="date" value="${wDate}"></div>
+      <div><label for="wK">Berat (kg)</label><input class="field" id="wK" type="number" inputmode="decimal" step="0.1" min="20" max="400" placeholder="mis. 72.4" value="${ex?ex.kg:""}"></div>
+    </div>
+    <div style="margin-top:16px"><button class="btn primary" id="wSave">Simpan berat</button></div>
+  </div>
+  <div class="card"><h2>Target berat badan</h2>
+    <div class="row2">
+      <div><label for="gT">Target (kg)</label><input class="field" id="gT" type="number" inputmode="decimal" step="0.1" min="20" placeholder="mis. 65" value="${g.targetKg}"></div>
+      <div><label for="gS">Berat awal (kg)</label><input class="field" id="gS" type="number" inputmode="decimal" step="0.1" min="20" placeholder="otomatis" value="${g.startKg}"></div>
+    </div>
+    <div class="hint" style="margin-top:8px">Berat awal dikosongkan = pakai catatan pertama.</div>
+    <div style="margin-top:16px"><button class="btn primary" id="gSave">Simpan target</button></div>
+  </div>
+  <div class="card"><h2>Riwayat</h2>${hist||`<div class="empty">Belum ada riwayat.</div>`}</div>`;
+}
+function bindBB(){
+  $("#rng").onclick = e=>{ const b=e.target.closest("[data-rng]"); if(!b) return; wRange=+b.dataset.rng; render(true); };
+  $("#wD").onchange = e=>{ wDate=e.target.value||todayIso(); const w=weightOn(wDate); $("#wK").value = w?w.kg:""; };
+  $("#wSave").onclick = ()=>{
+    const d=$("#wD").value, kg=parseFloat($("#wK").value);
+    if(!d){ toast("Isi tanggalnya dulu"); return; }
+    if(!(kg>=20 && kg<=400)){ toast("Isi berat antara 20 dan 400 kg"); return; }
+    const i=S.weights.findIndex(w=>w.date===d); const rec={date:d,kg:Math.round(kg*10)/10};
+    if(i>=0) S.weights[i]=rec; else S.weights.push(rec);
+    wDate=d; save(); render(true); toast("Berat tersimpan ✓");
+  };
+  $("#gSave").onclick = ()=>{
+    const num=v=>{const n=parseFloat(v); return isFinite(n)&&n>0?n:"";};
+    S.goals.targetKg=num($("#gT").value); S.goals.startKg=num($("#gS").value);
+    save(); render(true); toast("Target disimpan ✓");
+  };
+  const upd=()=>{ $("#calcOut").innerHTML=calcHtml(parseFloat($("#cH").value), parseFloat($("#cW").value), S.goals.sex); };
+  $("#cH").oninput=()=>{ const h=parseFloat($("#cH").value); S.goals.height=(h>=100&&h<=230)?h:""; save(); upd(); };
+  $("#cW").oninput=()=>{ cWeight=$("#cW").value; upd(); };
+  $("#cSex").onclick=e=>{ const b=e.target.closest("[data-sex]"); if(!b) return; S.goals.sex=b.dataset.sex; save(); render(true); };
+  $("#calcOut").onclick=e=>{ const b=e.target.closest("[data-settgt]"); if(!b) return; S.goals.targetKg=+b.dataset.settgt; save(); render(true); toast("Target berat diatur ✓"); };
+}
+
+/* ---------- Laporan ---------- */
+function viewReport(){
+  const mk=monthKey(), recs=S.records.filter(r=>r.date.startsWith(mk)&&r.status==="done");
+  const mins=recs.reduce((s,r)=>s+(+r.dur||0),0);
+  const wk=[0,0,0,0,0]; recs.forEach(r=>{ wk[Math.min(4,Math.floor((+r.date.slice(8,10)-1)/7))]++; });
+  const maxW=Math.max(1,...wk);
+  const bars=wk.map((n,i)=>`<div class="bar"><em>${n||""}</em><i style="height:${Math.max(3,n/maxW*100)}%"></i><span>M${i+1}</span></div>`).join("");
+  const days=new Set(S.records.filter(r=>r.status==="done").map(r=>r.date));
+  let streak=0, dd=new Date(); if(!days.has(iso(dd))) dd.setDate(dd.getDate()-1);
+  while(days.has(iso(dd))){ streak++; dd.setDate(dd.getDate()-1); }
+  const activeDays=new Set(recs.map(r=>r.date)).size;
+  const by=Object.keys(ACTS).map(k=>{ const rr=recs.filter(r=>r.act===k); return {k, n:rr.length, m:rr.reduce((s,r)=>s+(+r.dur||0),0), met:rr.reduce((s,r)=>s+(+r.metric||0),0)}; }).filter(x=>x.n).sort((a,b)=>b.n-a.n);
+  const tot=recs.length||1;
+  const byHtml=by.map(x=>{ const a=ACTS[x.k]; return `<div style="margin:14px 0"><div class="rowb"><span>${a.emoji} ${a.name}</span><small>${x.n} sesi · ${fmt(x.m)} mnt${x.met?` · ${fmt(x.met)} ${a.metric.unit}`:""}</small></div>
+    <div class="prog"><i style="width:${x.n/tot*100}%;background:${a.c}"></i></div></div>`; }).join("");
+  const ws=weekStart(new Date()), we=new Date(ws); we.setDate(we.getDate()+7);
+  const wkDone=S.records.filter(r=>r.status==="done"&&parse(r.date)>=ws&&parse(r.date)<we).length;
+  const gw=+S.goals.week||1, gm=+S.goals.minutes||0;
+  const p1=Math.min(100,wkDone/gw*100), p2=gm?Math.min(100,mins/gm*100):0;
+  return `${monthNav()}
+  <div class="card">
+    <div class="grid2">
+      <div class="stat"><small>Sesi selesai</small><b class="good">${recs.length}</b></div>
+      <div class="stat"><small>Total durasi</small><b>${fmt(mins)} mnt</b></div>
+    </div>
+    <div class="grid2" style="margin-bottom:0">
+      <div class="stat"><small>Streak</small><b>🔥 ${streak} hari</b></div>
+      <div class="stat"><small>Hari aktif</small><b>${activeDays} hari</b></div>
+    </div>
+  </div>
+  <div class="card"><h2>Sesi per minggu</h2>
+    ${recs.length?`<div class="bars">${bars}</div><div class="hint">M1 = tanggal 1-7, M2 = 8-14, dan seterusnya.</div>`:`<div class="empty"><big>📊</big>Belum ada sesi selesai di bulan ini.</div>`}</div>
+  <div class="card"><h2>Per aktivitas</h2>${byHtml||`<div class="empty">Belum ada data.</div>`}</div>
+  <div class="card"><h2>Target latihan</h2>
+    <div style="margin:12px 0"><div class="rowb"><span>Sesi minggu ini</span><small>${wkDone} / ${gw}</small></div><div class="prog"><i style="width:${p1}%"></i></div></div>
+    <div style="margin:12px 0"><div class="rowb"><span>Durasi bulan ini</span><small>${fmt(mins)} / ${fmt(gm)} mnt</small></div><div class="prog"><i style="width:${p2}%"></i></div></div>
+    <div class="row2"><div><label for="gW">Sesi per minggu</label><input class="field" id="gW" type="number" inputmode="numeric" min="1" max="21" value="${S.goals.week}"></div>
+    <div><label for="gM">Menit per bulan</label><input class="field" id="gM" type="number" inputmode="numeric" min="0" step="10" value="${S.goals.minutes}"></div></div>
+    <div style="margin-top:16px"><button class="btn primary" id="tSave">Simpan target</button></div>
+  </div>
+  <div class="card"><h2>Cadangan data</h2>
+    <p class="hint">Data tersimpan di HP ini saja. Ekspor berkala agar aman kalau data browser terhapus.</p>
+    <div class="seg"><button class="btn" id="exp">⬇️ Ekspor</button><button class="btn" id="imp">⬆️ Impor</button></div>
+    <input type="file" id="impFile" accept="application/json" class="hide">
+  </div>`;
+}
+function bindReport(){
+  $("#tSave").onclick = ()=>{
+    S.goals.week=Math.max(1,Math.min(21,parseInt($("#gW").value)||1));
+    S.goals.minutes=Math.max(0,parseInt($("#gM").value)||0);
+    save(); render(true); toast("Target disimpan ✓");
+  };
+  $("#exp").onclick = exportData;
+  $("#imp").onclick = ()=>$("#impFile").click();
+  $("#impFile").onchange = e=>importData(e.target.files[0]);
+}
+function exportData(){
+  const blob=new Blob([JSON.stringify(S,null,2)],{type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=`mr-activity-${todayIso()}.json`;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),2000); toast("Data diekspor");
+}
+function importData(f){
+  if(!f) return; const rd=new FileReader();
+  rd.onload=()=>{ try{ const d=JSON.parse(rd.result); if(!d||!Array.isArray(d.records)) throw 0; S=norm(d); save(); render(); toast("Data diimpor ✓"); }catch(e){ toast("File tidak valid"); } };
+  rd.readAsText(f);
+}
+
+/* ================= Interaksi global ================= */
+document.addEventListener("click", e=>{
+  const t=e.target.closest("[data-nav],[data-day],[data-edit],[data-done],[data-del],[data-rdone],[data-radd],[data-rdel],[data-addday],[data-wday],[data-wdel]");
+  if(!t) return; const D=t.dataset;
+  if(D.nav){ cur.m+=+D.nav; if(cur.m<0){cur.m=11;cur.y--;} if(cur.m>11){cur.m=0;cur.y++;}
+    const now=new Date(); sel = (cur.y===now.getFullYear()&&cur.m===now.getMonth()) ? todayIso() : `${cur.y}-${pad(cur.m+1)}-01`; render(true); }
+  else if(D.day){ sel=D.day; render(true); }
+  else if(D.edit){ const r=S.records.find(x=>x.id===D.edit); if(r){ draft={...r}; S.tab="add"; render(); } }
+  else if(D.done){ const r=S.records.find(x=>x.id===D.done); if(r){ r.status="done"; save(); render(true); toast("Ditandai selesai ✓"); } }
+  else if(D.del) confirmDel(D.del);
+  else if(D.rdone){ const [ds,id]=D.rdone.split("|"); const x=Object.values(S.routine).flat().find(y=>y.id===id);
+    if(x){ S.records.push({id:uid(),act:x.act,type:x.type,date:ds,time:x.time||"",dur:"",metric:"",extra:"",detail:"",status:"done"}); save(); render(true); toast("Ditandai selesai ✓"); } }
+  else if(D.radd!==undefined) openRoutineSheet(+D.radd);
+  else if(D.rdel){ const [wd,id]=D.rdel.split("|"); confirmRoutineDel(wd,id); }
+  else if(D.addday){ draft=newDraft(); S.tab="add"; render(); }
+  else if(D.wday){ wDate=sel; S.tab="bb"; render(); }
+  else if(D.wdel){ confirmWDel(D.wdel); }
+});
+$("#nav").onclick = e=>{ const b=e.target.closest("button"); if(!b) return;
+  if(b.dataset.t==="add"){ if(!draft || draft._keep) draft=newDraft(); }
+  else if(draft && !draft.id) draft=null;
+  S.tab=b.dataset.t; save(); render(); };
+$("#todayBtn").onclick = ()=>{ const n=new Date(); cur={y:n.getFullYear(),m:n.getMonth()}; sel=todayIso(); S.tab="cal"; render(); };
+$("#themeBtn").onclick = ()=>{ S.theme = document.documentElement.dataset.theme==="dark"?"light":"dark"; save(); applyTheme(); };
+
+/* ---------- sheet ---------- */
+function openSheet(html){ $("#sheet").innerHTML=html; $("#modal").classList.add("show"); }
+function closeSheet(){ $("#modal").classList.remove("show"); }
+$("#modal").onclick = e=>{ if(e.target.id==="modal") closeSheet(); };
+function confirmBox(title, text, onYes){
+  openSheet(`<h3>${title}</h3><div class="hint">${text}</div><div class="btns"><button class="btn" id="no">Batal</button><button class="btn danger" id="yes">Hapus</button></div>`);
+  $("#sheet").onclick=null; $("#no").onclick=closeSheet; $("#yes").onclick=()=>{ closeSheet(); onYes(); };
+}
+function confirmDel(id){ const r=S.records.find(x=>x.id===id); if(!r) return;
+  confirmBox("Hapus sesi ini?", `${esc(r.type)} · ${r.date}. Tindakan ini tidak bisa dibatalkan.`, ()=>{ S.records=S.records.filter(x=>x.id!==id); save(); render(true); toast("Sesi dihapus"); }); }
+function confirmWDel(d){ confirmBox("Hapus catatan berat?", `Catatan tanggal ${d} akan dihapus.`, ()=>{ S.weights=S.weights.filter(w=>w.date!==d); save(); render(true); toast("Catatan dihapus"); }); }
+function confirmRoutineDel(wd,id){ const x=(S.routine[wd]||[]).find(y=>y.id===id); if(!x) return;
+  confirmBox("Hapus dari jadwal mingguan?", `${esc(x.type)} setiap ${DAYSF[+wd]}. Sesi yang sudah tercatat tidak ikut terhapus.`, ()=>{ S.routine[wd]=S.routine[wd].filter(y=>y.id!==id); save(); render(true); toast("Dihapus dari jadwal"); }); }
+
+function openRoutineSheet(wd){
+  rdraft={wd, act:"gym", type:ACTS.gym.types[0], time:""};
+  drawRoutineSheet();
+}
+function drawRoutineSheet(){
+  const r=rdraft, a=ACTS[r.act];
+  openSheet(`<h3>Tambah jadwal ${DAYSF[r.wd]}</h3><div class="hint">Muncul tiap ${DAYSF[r.wd]} di kalender.</div>
+    <label>Aktivitas</label><div class="seg">${Object.entries(ACTS).map(([k,v])=>`<button class="chip act ${k===r.act?"on":""}" style="--c:${v.c}" data-ract="${k}">${v.emoji} ${v.name}</button>`).join("")}</div>
+    <label>Jenis ${a.name}</label><div class="seg">${a.types.map(t=>`<button class="chip ${t===r.type?"on":""}" data-rtype="${esc(t)}">${esc(t)}</button>`).join("")}</div>
+    <label for="rTime">Jam (opsional)</label><input class="field" id="rTime" type="time" value="${esc(r.time)}">
+    <div class="btns"><button class="btn" id="rNo">Batal</button><button class="btn ok" id="rYes">Tambah</button></div>`);
+  $("#sheet").onclick = e=>{
+    const b=e.target.closest("button"); if(!b) return;
+    if(b.dataset.ract){ r.time=$("#rTime").value; r.act=b.dataset.ract; r.type=ACTS[r.act].types[0]; drawRoutineSheet(); }
+    else if(b.dataset.rtype){ r.time=$("#rTime").value; r.type=b.dataset.rtype; drawRoutineSheet(); }
+    else if(b.id==="rNo") closeSheet();
+    else if(b.id==="rYes"){ r.time=$("#rTime").value; (S.routine[r.wd]=S.routine[r.wd]||[]).push({id:uid(),act:r.act,type:r.type,time:r.time}); save(); closeSheet(); render(true); toast("Ditambahkan ke jadwal mingguan ✓"); }
+  };
+}
+
+let tt; function toast(m){ const t=$("#toast"); t.textContent=m; t.classList.add("show"); clearTimeout(tt); tt=setTimeout(()=>t.classList.remove("show"),2300); }
+
+render();
+if("serviceWorker" in navigator && location.protocol.startsWith("http")){
+  addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+}
+</script>
+</body>
+</html>
